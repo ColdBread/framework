@@ -2,6 +2,8 @@
     // compiler (tsc) and makes VSCode recognize this folder as a TS project,
     // enabling the VSCode build tasks "tsc: build" and "tsc: watch".
     "compilerOptions": {
+      "baseUrl": ".",
+      "paths": { "*": ["types/*"] },
       "outDir": "./build",
       "target": "es6",            // Compatible with older browsers
       "module": "umd",            // Compatible with both Node.js and browser
@@ -21,3 +23,4 @@
     "include": ["**/*.ts", "**/*.tsx"],
     "exclude": ["node_modules"]
   }
+  

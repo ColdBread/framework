@@ -6,31 +6,39 @@ interface GeneratingMetadata {
     fields: FieldMetadata[];
 }
 
+interface QueryAndMutationMetadata {
+    type: string;
+
+}
+
 export abstract class SchemaGenerator {
 
     static schema = ``;
     static devFlag = true;
     static typeDefs:GeneratingMetadata[] = [];
+    static queriesAndMutations:QueryAndMutationMetadata[] = [];
     
 
     static generateSchema([model]: any): GraphQLSchema | void {
         if(this.devFlag) {
-            console.log("Hello World!");
-            console.log(`${this.schema} schema :(`);
+            //console.log("Hello World!");
+            //console.log(`${this.schema} schema :(`);
             this.typeDefs.forEach(el => {
-                console.log("fieldTarget:");
-                console.log(el.target);
+                //console.log("fieldTarget:");
+                //console.log(el.target);
                 this.schema+=`type ${el.target} {`;
                 el.fields.forEach(field=> {
-                    console.log("fieldSpec:")
-                    console.log(`${field.name} : ${field.type}`);
+                    //console.log("fieldSpec:")
+                    //console.log(`${field.name} : ${field.type}`);
                     this.schema+=`\n ${field.name}: ${field.type}`;
                 });
                 this.schema+=`\n }\n`;
             });
-            
-            console.log(this.schema);
-            return buildSchema(this.schema);
+            this.schema+=`type Query {
+    hello: String
+}`
+            //console.log(this.schema);
+            //return buildSchema(this.schema);
         } else {
             return buildSchema(this.schema);
         }

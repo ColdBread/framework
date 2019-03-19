@@ -1,5 +1,5 @@
 import { Author } from "./Author";
-import { Query } from "../src";
+import { Query, Arg, Mutation } from "../src";
 
 export class AuthorResolver {
   readonly items: Author[] = [new Author(), new Author()];
@@ -9,4 +9,14 @@ export class AuthorResolver {
     return await this.items.find(el => el.name === "kek");
   }
   */
+  @Query()
+  author(@Arg("postTitle") postTitle: string): string {
+    return postTitle;
+  }
+  
+  @Mutation()
+  changeName(@Arg("changedName") changedName: string): string {
+    return changedName;
+  }
+  
 }
