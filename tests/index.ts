@@ -1,4 +1,4 @@
-import { SchemaGenerator, Arg } from "./src";
+import { SchemaGenerator, Arg } from "../src";
 import { Author } from "./models/Author";
 import { Post } from "./models/Post";
 import { AuthorResolver } from "./models/AuthorResolver";

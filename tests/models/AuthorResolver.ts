@@ -1,5 +1,5 @@
 import { Author } from "./Author";
-import { Query, Arg, Mutation } from "../src";
+import { Query, Arg, Mutation } from "../../src";
 
 export class AuthorResolver {
   readonly items: Author[] = [new Author(), new Author()];

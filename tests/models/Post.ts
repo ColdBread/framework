@@ -1,4 +1,4 @@
-import { ObjectType, Field } from "../src";
+import { ObjectType, Field } from "../../src";
 import { Author } from "./Author";
 
 //@ObjectType
