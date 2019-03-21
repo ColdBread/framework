@@ -11,12 +11,25 @@ interface QueryAndMutationMetadata {
 
 }
 
+interface QueryMetadata {
+    
+}
+
+interface ArgMetadata {
+    target: string;
+    propertyKey: string;
+    parameterIndex: number;
+    name: string;
+    type: string;
+}
+
 export abstract class SchemaGenerator {
 
     static schema = ``;
     static devFlag = true;
     static typeDefs:GeneratingMetadata[] = [];
     static queriesAndMutations:QueryAndMutationMetadata[] = [];
+    static argsTempStorage: ArgMetadata[] = [];
     
 
     static generateSchema([model]: any): GraphQLSchema | void {
@@ -54,6 +67,10 @@ export abstract class SchemaGenerator {
                 fields: [definition]
             })
         }
+    }
+
+    static addArgMetadata(definition: ArgMetadata) {
+        this.argsTempStorage.push(definition);
     }
     /*
     static addObjectType(definition: ClassMetadata) {
