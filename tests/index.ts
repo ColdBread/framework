@@ -17,9 +17,12 @@ class lol {
 const mySchema = SchemaGenerator.generateSchema([Author, Post, AuthorResolver]);
 
 let root = {
+  author: function ({ postTitle } :{ [key:string]:string }) {
+    return AuthorResolver.prototype.author(postTitle);
+  },
 
 }
-/*
+/**/ 
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
 
@@ -27,6 +30,7 @@ const app = express();
 
 app.use('/graphql', graphqlHTTP({
   schema: mySchema,
+  rootValue: root,
   graphiql: true
 }));
 
@@ -35,4 +39,4 @@ const port = 4000;
 app.listen(port);
 console.log(`Server is running on ${port}
 Go to localhost:${port}/graphql`);
-*/
+/**/

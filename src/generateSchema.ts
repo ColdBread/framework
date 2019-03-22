@@ -105,7 +105,7 @@ export abstract class SchemaGenerator {
     hello: String
 }`*/
             console.log(this.schema);
-            //return buildSchema(this.schema);
+            return buildSchema(this.schema);
         } else {
             return buildSchema(this.schema);
         }

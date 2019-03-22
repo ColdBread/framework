@@ -11,7 +11,8 @@ export class AuthorResolver {
   */
   @Query()
   author(@Arg("postTitle") postTitle: string): string {
-    return postTitle;
+    console.log(postTitle);
+    return postTitle.toString();
   }
 
   @Query("[String]")
