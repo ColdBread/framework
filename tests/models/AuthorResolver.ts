@@ -13,6 +13,16 @@ export class AuthorResolver {
   author(@Arg("postTitle") postTitle: string): string {
     return postTitle;
   }
+
+  @Query("[String]")
+  keks(@Arg("lol") lol: string, @Arg("sobaka") sobaka: boolean): [string] {
+    return ["bob"];
+  }
+
+  @Query()
+  authorKek(@Arg("name") name: string): Author {
+    return new Author();
+  }
   
   @Mutation()
   changeName(@Arg("changedName") changedName: string): string {

@@ -12,7 +12,15 @@ interface QueryAndMutationMetadata {
 }
 
 interface QueryMetadata {
-    
+    key: string;
+    returnType: string;
+    args: ArgMetadata[];
+}
+
+interface MutationMetadata {
+    key: string;
+    returnType: string;
+    args: ArgMetadata[];
 }
 
 interface ArgMetadata {
@@ -30,6 +38,8 @@ export abstract class SchemaGenerator {
     static typeDefs:GeneratingMetadata[] = [];
     static queriesAndMutations:QueryAndMutationMetadata[] = [];
     static argsTempStorage: ArgMetadata[] = [];
+    static queriesMetadata: QueryMetadata[] = [];
+    static mutationsMetadata: MutationMetadata[] = [];
     
 
     static generateSchema([model]: any): GraphQLSchema | void {
@@ -47,10 +57,54 @@ export abstract class SchemaGenerator {
                 });
                 this.schema+=`\n }\n`;
             });
+            
+            this.schema += `type Query {\n`;
+            this.queriesMetadata.forEach(el => {
+                this.schema+=` ${el.key}`;
+                if(el.args.length === 0) {
+                    this.schema+=`: `;
+                } else {
+                    this.schema+=`(`;
+                    //console.log("------el.args.length------");
+                    //console.log(el.args.length);
+                    for(let i = 0; i < el.args.length; i++) {
+                        if(i === el.args.length - 1) {
+                            this.schema+=`${el.args[i].name}: ${el.args[i].type}): `;
+                        } else {
+                            this.schema += `${el.args[i].name}: ${el.args[i].type}, `;
+                        }
+                    }
+                }
+                this.schema+=`${el.returnType} \n`;
+            })
+            this.schema+=`} \n`;
+
+            this.schema += `type Mutation {\n`;
+            this.mutationsMetadata.forEach(el => {
+                this.schema+=` ${el.key}`;
+                if(el.args.length === 0) {
+                    this.schema+=`: `;
+                } else {
+                    this.schema+=`(`;
+                    //console.log("------el.args.length------");
+                    //console.log(el.args.length);
+                    for(let i = 0; i < el.args.length; i++) {
+                        if(i === el.args.length - 1) {
+                            this.schema+=`${el.args[i].name}: ${el.args[i].type}): `;
+                        } else {
+                            this.schema += `${el.args[i].name}: ${el.args[i].type}, `;
+                        }
+                    }
+                }
+                this.schema+=`${el.returnType} \n`;
+            })
+            this.schema+=`} \n`;
+
+/*
             this.schema+=`type Query {
     hello: String
-}`
-            //console.log(this.schema);
+}`*/
+            console.log(this.schema);
             //return buildSchema(this.schema);
         } else {
             return buildSchema(this.schema);
@@ -70,7 +124,26 @@ export abstract class SchemaGenerator {
     }
 
     static addArgMetadata(definition: ArgMetadata) {
+        //console.log(`pushed ${definition.name} to argsStorage`);
         this.argsTempStorage.push(definition);
+    }
+
+    static addQueryMetadata(definition: QueryMetadata) {
+        let args = this.argsTempStorage.filter(it => it.propertyKey=== definition.key).reverse();
+        if(args){
+            definition.args.push(...args);
+            this.argsTempStorage = [];
+        }
+        this.queriesMetadata.push(definition);
+    }
+
+    static addMutationMetadata(definition: MutationMetadata) {
+        let args = this.argsTempStorage.filter(it => it.propertyKey=== definition.key).reverse();
+        if(args){
+            definition.args.push(...args);
+            this.argsTempStorage = [];
+        }
+        this.mutationsMetadata.push(definition);
     }
     /*
     static addObjectType(definition: ClassMetadata) {
