@@ -10,14 +10,20 @@ export class AuthorResolver {
   }
   */
   @Query()
-  author(@Arg("postTitle") postTitle: string): string {
+  author( @Arg("postTitle") postTitle: string): string {
     console.log(postTitle);
-    return postTitle.toString();
+    let str = JSON.stringify(postTitle);
+    console.log(str);
+    let post = JSON.parse(str);
+    console.log(post);
+    return post.postTitle;
   }
 
   @Query("[String]")
-  keks(@Arg("lol") lol: string, @Arg("sobaka") sobaka: boolean): [string] {
-    return ["bob"];
+  keks(@Arg("lol") lol: string, @Arg("sobaka") sobaka: boolean): string[] {
+    console.log(lol);
+    console.log(sobaka);
+    return [lol, JSON.stringify(sobaka)];
   }
 
   @Query()

@@ -16,6 +16,7 @@ export function Mutation(): MethodDecorator {
     //console.log(t.name);
 
     SchemaGenerator.addMutationMetadata({
+      target,
       key,
       returnType: t.name,
       args: []

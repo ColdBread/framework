@@ -18,14 +18,20 @@ export function Arg(name: string): ParameterDecorator {
     //let t = Reflect.getMetadata("design:type",target,);
     //console.log(types[parameterIndex].name);
     //console.log(t.name);
-
+    let type = types[parameterIndex].name;
+    let values = Object.keys(types[parameterIndex]);
+    console.log(types[parameterIndex]);
+    console.log(types[parameterIndex]);
+    //console.log(Object.entries(types[parameterIndex]));
+    //console.log(type);
+    //console.log(values);
     
     SchemaGenerator.addArgMetadata({
       target: target.constructor.name,
       propertyKey,
       parameterIndex,
       name,
-      type: types[parameterIndex].name
+      type
     });
   }
 }

@@ -17,7 +17,8 @@
       "lib":[
         "esnext.asynciterable",
         "es2015",
-        "dom"
+        "dom",
+        "es2017.object"
       ]
     },
     "include": ["**/*.ts", "**/*.tsx"],

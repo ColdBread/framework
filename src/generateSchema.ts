@@ -1,5 +1,6 @@
 import { buildSchema, GraphQLSchema }  from'graphql';
 import { ClassMetadata, FieldMetadata } from './definitions';
+import graphql = require('graphql');
 
 interface GeneratingMetadata {
     target: string;
@@ -12,12 +13,14 @@ interface QueryAndMutationMetadata {
 }
 
 interface QueryMetadata {
+    target: Object;
     key: string;
     returnType: string;
     args: ArgMetadata[];
 }
 
 interface MutationMetadata {
+    target: Object;
     key: string;
     returnType: string;
     args: ArgMetadata[];
@@ -31,6 +34,10 @@ interface ArgMetadata {
     type: string;
 }
 
+interface QueryLol {
+    [key:string]: any;
+}
+
 export abstract class SchemaGenerator {
 
     static schema = ``;
@@ -40,74 +47,59 @@ export abstract class SchemaGenerator {
     static argsTempStorage: ArgMetadata[] = [];
     static queriesMetadata: QueryMetadata[] = [];
     static mutationsMetadata: MutationMetadata[] = [];
+    static root:{[key: string] : any} = {};
+    
     
 
-    static generateSchema([model]: any): GraphQLSchema | void {
+    static generateSchema([model]: any): {schema: GraphQLSchema, root: any} {
         if(this.devFlag) {
             //console.log("Hello World!");
             //console.log(`${this.schema} schema :(`);
-            this.typeDefs.forEach(el => {
-                //console.log("fieldTarget:");
-                //console.log(el.target);
-                this.schema+=`type ${el.target} {`;
-                el.fields.forEach(field=> {
-                    //console.log("fieldSpec:")
-                    //console.log(`${field.name} : ${field.type}`);
-                    this.schema+=`\n ${field.name}: ${field.type}`;
-                });
-                this.schema+=`\n }\n`;
-            });
             
-            this.schema += `type Query {\n`;
+            this.schema += this.generateTypes(this.typeDefs);
+            this.schema += this.generateQueries(this.queriesMetadata);
+            this.schema += this.generateMutations(this.mutationsMetadata);
+            
             this.queriesMetadata.forEach(el => {
-                this.schema+=` ${el.key}`;
-                if(el.args.length === 0) {
-                    this.schema+=`: `;
-                } else {
-                    this.schema+=`(`;
-                    //console.log("------el.args.length------");
-                    //console.log(el.args.length);
-                    for(let i = 0; i < el.args.length; i++) {
-                        if(i === el.args.length - 1) {
-                            this.schema+=`${el.args[i].name}: ${el.args[i].type}): `;
-                        } else {
-                            this.schema += `${el.args[i].name}: ${el.args[i].type}, `;
-                        }
-                    }
-                }
-                this.schema+=`${el.returnType} \n`;
+                let keY = el.key;
+                let target = el.target;
+                let args = el.args.map((ele:ArgMetadata) => {
+                    return ele.name;
+                })
+                console.log(args);
+                let argumen:{[key: string] : any} = {}
+                args.forEach(arg => {
+                    argumen[arg];
+                })
+                console.log(Object.keys(argumen));
+                //console.log(key);
+                //console.log(target.constructor.prototype[key]);
+                this.root[keY] = ({ ...kekos }:{[key:string]:any} = argumen ) => target.constructor.prototype[keY](kekos);
             })
-            this.schema+=`} \n`;
 
-            this.schema += `type Mutation {\n`;
             this.mutationsMetadata.forEach(el => {
-                this.schema+=` ${el.key}`;
-                if(el.args.length === 0) {
-                    this.schema+=`: `;
-                } else {
-                    this.schema+=`(`;
-                    //console.log("------el.args.length------");
-                    //console.log(el.args.length);
-                    for(let i = 0; i < el.args.length; i++) {
-                        if(i === el.args.length - 1) {
-                            this.schema+=`${el.args[i].name}: ${el.args[i].type}): `;
-                        } else {
-                            this.schema += `${el.args[i].name}: ${el.args[i].type}, `;
-                        }
-                    }
-                }
-                this.schema+=`${el.returnType} \n`;
+                let key = el.key;
+                let target = el.target;
+                //console.log(key);
+                //console.log(target.constructor.prototype[key]);
+                this.root[key] = target.constructor.prototype[key];
             })
-            this.schema+=`} \n`;
+
+
+            //let key = this.queriesMetadata[0].key;
+            //let target = this.queriesMetadata[0].target;
+             
+            //console.log();
+            
 
 /*
             this.schema+=`type Query {
     hello: String
 }`*/
             console.log(this.schema);
-            return buildSchema(this.schema);
+            return {schema: buildSchema(this.schema), root: this.root};
         } else {
-            return buildSchema(this.schema);
+            return {schema: buildSchema(this.schema), root: this.root};
         }
         
     }
@@ -144,6 +136,72 @@ export abstract class SchemaGenerator {
             this.argsTempStorage = [];
         }
         this.mutationsMetadata.push(definition);
+    }
+
+    private static generateTypes(typeDefs: GeneratingMetadata[]): string {
+        let schema = ``;
+        typeDefs.forEach(el => {
+            //console.log("fieldTarget:");
+            //console.log(el.target);
+            schema+=`type ${el.target} {`;
+            el.fields.forEach(field=> {
+                //console.log("fieldSpec:")
+                //console.log(`${field.name} : ${field.type}`);
+                schema+=`\n ${field.name}: ${field.type}`;
+            });
+            schema+=`\n }\n`;
+        });
+        return schema;
+    }
+
+    private static generateQueries(queriesMetadata: QueryMetadata[]): string {
+        let schema = ``;
+        schema += `type Query {\n`;
+            queriesMetadata.forEach(el => {
+                schema+=` ${el.key}`;
+                if(el.args.length === 0) {
+                    schema+=`: `;
+                } else {
+                    schema+=`(`;
+                    //console.log("------el.args.length------");
+                    //console.log(el.args.length);
+                    for(let i = 0; i < el.args.length; i++) {
+                        if(i === el.args.length - 1) {
+                            schema+=`${el.args[i].name}: ${el.args[i].type}): `;
+                        } else {
+                            schema += `${el.args[i].name}: ${el.args[i].type}, `;
+                        }
+                    }
+                }
+                schema+=`${el.returnType} \n`;
+            })
+            schema+=`} \n`;
+            return schema;
+    }
+
+    private static generateMutations(mutationsMetadata: MutationMetadata[]): string {
+        let schema = ``;
+        schema += `type Mutation {\n`;
+            mutationsMetadata.forEach(el => {
+                schema+=` ${el.key}`;
+                if(el.args.length === 0) {
+                    schema+=`: `;
+                } else {
+                    schema+=`(`;
+                    //console.log("------el.args.length------");
+                    //console.log(el.args.length);
+                    for(let i = 0; i < el.args.length; i++) {
+                        if(i === el.args.length - 1) {
+                            schema+=`${el.args[i].name}: ${el.args[i].type}): `;
+                        } else {
+                            schema += `${el.args[i].name}: ${el.args[i].type}, `;
+                        }
+                    }
+                }
+                schema+=`${el.returnType} \n`;
+            })
+            schema+=`} \n`;
+            return schema;
     }
     /*
     static addObjectType(definition: ClassMetadata) {

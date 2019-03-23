@@ -20,6 +20,7 @@ export function Query(arrayOptions?: string) : MethodDecorator {
     }
 
     SchemaGenerator.addQueryMetadata({
+      target: target,
       key,
       returnType: arrayOptions ? arrayOptions : t.name,
       args:[]

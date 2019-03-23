@@ -14,22 +14,25 @@ class lol {
 
 }
 */
-const mySchema = SchemaGenerator.generateSchema([Author, Post, AuthorResolver]);
-
+const { schema, root } = SchemaGenerator.generateSchema([Author, Post, AuthorResolver]);
+/*
 let root = {
-  author: function ({ postTitle } :{ [key:string]:string }) {
+  author: ({ postTitle } :{ [key:string]:string }) => {
     return AuthorResolver.prototype.author(postTitle);
   },
-
+  keks: ({ lol, sobaka }: { [key:string]:any }) => {
+    return AuthorResolver.prototype.keks(lol, sobaka);
+  }
 }
 /**/ 
+console.log(root);
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
 
 const app = express();
 
 app.use('/graphql', graphqlHTTP({
-  schema: mySchema,
+  schema,
   rootValue: root,
   graphiql: true
 }));
