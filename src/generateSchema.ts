@@ -1,6 +1,7 @@
 import { buildSchema, GraphQLSchema }  from'graphql';
 import { ClassMetadata, FieldMetadata } from './definitions';
 import graphql = require('graphql');
+import { AuthorResolver } from '../tests/models/AuthorResolver';
 
 interface GeneratingMetadata {
     target: string;
@@ -48,11 +49,13 @@ export abstract class SchemaGenerator {
     static queriesMetadata: QueryMetadata[] = [];
     static mutationsMetadata: MutationMetadata[] = [];
     static root:{[key: string] : any} = {};
+    public static resolvers:any[] = [];
     
     
 
-    static generateSchema([model]: any): {schema: GraphQLSchema, root: any} {
+    static generateSchema(model: any[]): {schema: GraphQLSchema, root: any} {
         if(this.devFlag) {
+            this.resolvers = model;
             //console.log("Hello World!");
             //console.log(`${this.schema} schema :(`);
             
@@ -67,14 +70,17 @@ export abstract class SchemaGenerator {
                     return ele.name;
                 })
                 console.log(args);
+                
                 let argumen:{[key: string] : any} = {}
                 args.forEach(arg => {
-                    argumen[arg];
+                    argumen[arg] = "";
                 })
+
+                //let argumen = { ...args};
                 console.log(Object.keys(argumen));
                 //console.log(key);
                 //console.log(target.constructor.prototype[key]);
-                this.root[keY] = ({ ...kekos }:{[key:string]:any} = argumen ) => target.constructor.prototype[keY](kekos);
+                this.root[keY] = this.createFunctionWithArgs(argumen, keY, target, this.resolvers);
             })
 
             this.mutationsMetadata.forEach(el => {
@@ -102,6 +108,21 @@ export abstract class SchemaGenerator {
             return {schema: buildSchema(this.schema), root: this.root};
         }
         
+    }
+
+    static createFunctionWithArgs(args: {[key:string]:any}, key:string, target: Object, resolvers: any[]):Function {
+        console.log(`{${Object.keys(args)}}`);
+        console.log(resolvers);
+        //eval(`let ${target} = resolvers.find(el => el.constructor.name === "${target}" ); `);
+        /*
+        return new Function(`{${Object.keys(args)}}`,`{
+            let SchemaGenerator  = require('./generateSchema');
+            return SchemaGenerator.resolvers.find(el => el.constructor.name === "${target}" ).constructor.prototype[${key}](${Object.keys(args)});
+        }`);
+        */
+        return eval(`({${Object.keys(args)}})=> {
+            ${target}.constructor.prototype[${key}](${Object.keys(args)});
+        }`);
     }
 
     static addFieldMetadata(definition: FieldMetadata) {
