@@ -49,13 +49,13 @@ export abstract class SchemaGenerator {
     static queriesMetadata: QueryMetadata[] = [];
     static mutationsMetadata: MutationMetadata[] = [];
     static root:{[key: string] : any} = {};
-    public static resolvers:any[] = [];
+    //public static resolvers:any[] = [];
     
     
 
     static generateSchema(model: any[]): {schema: GraphQLSchema, root: any} {
         if(this.devFlag) {
-            this.resolvers = model;
+            //this.resolvers = model;
             //console.log("Hello World!");
             //console.log(`${this.schema} schema :(`);
             
@@ -64,31 +64,36 @@ export abstract class SchemaGenerator {
             this.schema += this.generateMutations(this.mutationsMetadata);
             
             this.queriesMetadata.forEach(el => {
-                let keY = el.key;
+                let key = el.key;
                 let target = el.target;
                 let args = el.args.map((ele:ArgMetadata) => {
                     return ele.name;
-                })
-                console.log(args);
-                
+                });
+                //console.log(args);
+                /*
                 let argumen:{[key: string] : any} = {}
                 args.forEach(arg => {
                     argumen[arg] = "";
                 })
-
+                */
                 //let argumen = { ...args};
-                console.log(Object.keys(argumen));
+                //console.log(Object.keys(argumen));
                 //console.log(key);
                 //console.log(target.constructor.prototype[key]);
-                this.root[keY] = this.createFunctionWithArgs(argumen, keY, target, this.resolvers);
+                //eval(`let ${target.constructor.name} = this.resolvers.find(el => el.constructor.name === "${target.constructor.name}" );`);
+                //this.root[keY] = this.createFunctionWithArgs(keY, target,argumen);
+                this.root[key] = this.createFunctionWithArgs(key, target,args);
             })
 
             this.mutationsMetadata.forEach(el => {
                 let key = el.key;
                 let target = el.target;
+                let args = el.args.map((ele:ArgMetadata) => {
+                    return ele.name;
+                })
                 //console.log(key);
                 //console.log(target.constructor.prototype[key]);
-                this.root[key] = target.constructor.prototype[key];
+                this.root[key] = this.createFunctionWithArgs(key, target,args);
             })
 
 
@@ -110,9 +115,16 @@ export abstract class SchemaGenerator {
         
     }
 
-    static createFunctionWithArgs(args: {[key:string]:any}, key:string, target: Object, resolvers: any[]):Function {
-        console.log(`{${Object.keys(args)}}`);
-        console.log(resolvers);
+    static createFunctionWithArgs(key:string, target: Object, argument?: string[]):Function {
+        return eval(`({${argument}}) => {
+            return target.constructor.prototype[key](${argument});
+        }`);
+    }
+
+/*
+    static createFunctionWithArgs(key:string, target: Object, args?: {[key:string]:any}):Function {
+        //console.log(`{${Object.keys(args)}}`);
+        
         //eval(`let ${target} = resolvers.find(el => el.constructor.name === "${target}" ); `);
         /*
         return new Function(`{${Object.keys(args)}}`,`{
@@ -120,10 +132,34 @@ export abstract class SchemaGenerator {
             return SchemaGenerator.resolvers.find(el => el.constructor.name === "${target}" ).constructor.prototype[${key}](${Object.keys(args)});
         }`);
         */
-        return eval(`({${Object.keys(args)}})=> {
-            ${target}.constructor.prototype[${key}](${Object.keys(args)});
+        //let AuthorResolver = new AuthorResolver();
+        /*eval(`let ${target.constructor.name} = resolvers.find(el => el.constructor.name === "${target.constructor.name}" );`);
+        console.log(`lol ${target.constructor.name}`);
+        let ar = Object.keys(args);
+        let x = eval(`function f({${Object.keys(args)}}) {
+            return ${target.constructor.name}.constructor.prototype[${key}](${Object.keys(args)});
+        }`);*/
+        //let resolver = SchemaGenerator.resolvers.find(el => el.prototype.constructor.name === target.constructor.name );
+        /*
+        return eval(`({${Object.keys(args!)}}) => {
+            return target.constructor.prototype[key](${Object.keys(args!)});
         }`);
-    }
+        return new Function(...Object.keys(args!), `return resolver.prototype[key](${Object.keys(args!)})`);
+
+
+        //console.log(SchemaGenerator.resolvers);
+        //console.log(resolver);
+        //console.log(target.constructor.name);
+        //console.log("kek na4inaetsa)");
+        /*SchemaGenerator.resolvers.forEach( el => {
+            console.log(el);
+            console.log(el.constructor.name);
+            console.log(el.prototype.name);
+            console.log(el.prototype.constructor.name);
+        })*/
+    //}
+
+    
 
     static addFieldMetadata(definition: FieldMetadata) {
         if(this.typeDefs.find(it => it.target === definition.target) !== undefined) {

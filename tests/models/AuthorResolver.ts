@@ -16,7 +16,7 @@ export class AuthorResolver {
     console.log(str);
     let post = JSON.parse(str);
     console.log(post);
-    return post.postTitle;
+    return postTitle;
   }
 
   @Query("[String]")
