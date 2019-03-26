@@ -1,4 +1,5 @@
 import { SchemaGenerator } from "../generateSchema";
+import { checkTypeCompatibility } from "../util";
 
 export function Arg(name: string): ParameterDecorator {
   return (target, propertyKey, parameterIndex) => {
@@ -19,12 +20,17 @@ export function Arg(name: string): ParameterDecorator {
     //console.log(types[parameterIndex].name);
     //console.log(t.name);
     let type = types[parameterIndex].name;
-    let values = Object.keys(types[parameterIndex]);
-    console.log(types[parameterIndex]);
-    console.log(types[parameterIndex]);
+    //let values = Object.keys(types[parameterIndex]);
+    //console.log(types[parameterIndex]);
     //console.log(Object.entries(types[parameterIndex]));
     //console.log(type);
     //console.log(values);
+
+    checkTypeCompatibility(target, propertyKey, type);
+
+    if(type === "Number") {
+      type = "Float";
+    }
     
     SchemaGenerator.addArgMetadata({
       target: target.constructor.name,

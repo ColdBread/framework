@@ -25,7 +25,7 @@ let root = {
   }
 }
 /**/ 
-console.log(root);
+//console.log(root);
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
 

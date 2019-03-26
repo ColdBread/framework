@@ -1,4 +1,5 @@
 import { SchemaGenerator } from "../generateSchema";
+import { checkTypeCompatibility } from "../util";
 
 export function Query(arrayOptions?: string) : MethodDecorator {
   return (target: Object, key: string|symbol, descriptor: any) => {
@@ -19,10 +20,18 @@ export function Query(arrayOptions?: string) : MethodDecorator {
       return;
     }
 
+    let returnType = arrayOptions ? arrayOptions : t.name;
+
+    checkTypeCompatibility(target, key, returnType);
+
+    if(returnType === "Number") {
+      returnType = "Float";
+    }
+
     SchemaGenerator.addQueryMetadata({
       target: target,
       key,
-      returnType: arrayOptions ? arrayOptions : t.name,
+      returnType,
       args:[]
     })
   }

@@ -1,10 +1,7 @@
 import { SchemaGenerator } from "../generateSchema";
-import { toUpperCaseSecondChar } from "../util";
+import { toUpperCaseSecondChar, checkTypeCompatibility } from "../util";
 import "reflect-metadata";
-
-export function hello() {
-    console.log("HEllo");
-}
+import { SchemaTypeError } from "../error";
 
 export function Field(arrayOptions?: string):  PropertyDecorator {
     return (target, key) => {
@@ -12,28 +9,23 @@ export function Field(arrayOptions?: string):  PropertyDecorator {
             return;
         }
         let t = Reflect.getMetadata("design:type", target, key);
+
+        let type = arrayOptions ? toUpperCaseSecondChar(arrayOptions) : t.name;
+        
+        checkTypeCompatibility(target, key, type);
+
+        if(type === "Number"){
+            type = "Float";
+        }
+
+
         SchemaGenerator.addFieldMetadata({
             name: key,
             target: target.constructor.name,
-            type: arrayOptions ? toUpperCaseSecondChar(arrayOptions) : t.name
+            type
         })
     };
 }
-/*
-export function Field(target: any, key: string) {
-    //console.log("---------target Field--------");
-    //console.log(target.constructor.name);
-    //console.log("--------key Field-------");
-    //console.log(key);
-    //console.log("-----------type Field---------");
-    let t = Reflect.getMetadata("design:type", target, key);
-    //console.log(t.name);
-    SchemaGenerator.addFieldMetadata({
-        target: target.constructor.name,
-        name: key,
-        type: t.name
-    });
-}
-*/
+
 
 
