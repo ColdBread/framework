@@ -89,9 +89,8 @@ export abstract class SchemaGenerator {
 
     static createFunctionWithArgs(key:string, target: Object, argument: string[]):Function {
         return eval(`({${argument}}) => {
-            return target.constructor.prototype[key](${argument});
+            return target[key](${argument});
         }`);
-        return new Function(...argument, `return resolver.prototype[key](${argument})`);
     }
 
     
